@@ -1,13 +1,11 @@
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 import sys
 from PyQt4 import QtGui, QtCore
 import time
 import random
+import sys
 
-app = QtGui.QApplication(sys.argv)
-
-scene = QtGui.QGraphicsScene()
-scene.setSceneRect(0, 0, 512, 512)
 	
 class Kletka(QtGui.QGraphicsPixmapItem):
 	def __init__(self):
@@ -26,8 +24,20 @@ class Fishka(QtGui.QGraphicsPixmapItem):
 		self.setPixmap(x)
 	def mousePressEvent(self, event):
 		Pressed(self.x(), self.y())
-		#AAA(self)
+		AAA(self)
 
+def rus(s):
+	return unicode(s, 'cp1251')
+	
+def currentPlayer():
+	global label
+	global player
+	if player:
+		str = rus("’од€т белые")
+	else:
+		str = rus("<font size=4>’од€т черные</font>")
+	label.setText(str)
+		
 def AAA(node):
 	node.hide()
 	
@@ -45,20 +55,8 @@ def newKletki():
 # -1 - пустое поле	
 # 0 - черна€ фишка
 # 1 - бела€ фишка
-def newGame():
-	# обнул€ем поле (убираем фишки)
-	global pole
-	pole = [
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1, 0, 1,-1,-1,-1],
-			[-1,-1,-1, 1, 0,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-		]
-		
+
+def createFishki():
 	#создаем все фишки
 	global scene
 	global fishki
@@ -73,18 +71,32 @@ def newGame():
 			f = Fishka("black")
 			scene.addItem(f)
 			f.setPos(x,y)
-			f.hide()
 			fish.append(f)
 			
 			# черные
 			f = Fishka("white")
 			scene.addItem(f)
 			f.setPos(x,y)
-			f.hide()
 			fish.append(f)
 			
 			row.append(fish)
 		fishki.append(row)	
+		
+def newGame():
+	# обнул€ем поле
+	global pole
+	global scene
+	pole = [
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1, 0, 1,-1,-1,-1],
+			[-1,-1,-1, 1, 0,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1],
+		]
+	reloadPole()
 		
 def reloadPole():
 	global scene
@@ -103,22 +115,61 @@ def Pressed(x,y):
 	col = int(x / 64)
 	global pole
 	
-				
+
+
+app = QtGui.QApplication(sys.argv)
+
+scene = QtGui.QGraphicsScene()
+scene.setSceneRect(0, 0, 512, 512)
+gamepole = QtGui.QGraphicsView(scene)
+
+newgamebutton = QtGui.QPushButton(rus("Ќова€ игра"))
+QtCore.QObject.connect(newgamebutton, QtCore.SIGNAL("clicked()"), newGame)
+closebutton = QtGui.QPushButton(rus("¬ыйти"))
+QtCore.QObject.connect(closebutton, QtCore.SIGNAL("clicked()"), app, QtCore.SLOT("quit()"))
+
+# 0 - ход€т черные
+# 1 - ход€т белые
+player = 0
+
+label = QtGui.QLabel()
+currentPlayer()
+hbox = QtGui.QHBoxLayout()
+hbox.addWidget(newgamebutton)
+hbox.addWidget(closebutton)
+hbox.addWidget(label)
+hbox.addStretch(1)
+
+vbox = QtGui.QVBoxLayout()
+vbox.addLayout(hbox)
+vbox.addWidget(gamepole)
+vbox.addStretch(1)
+
+window = QtGui.QWidget()
+window.setLayout(vbox)
+window.setWindowTitle(u"Reversi")
+window.show()
+
+
 newKletki()
 
 # 0 - ход€т черные
 # 1 - ход€т белые
 player = 0
 
-pole = []
 fishki = []
+createFishki()
+
+pole = []
 newGame()
-reloadPole()
 
 
 
-view = QtGui.QGraphicsView(scene)
-view.setWindowTitle("Reversi")
-view.show()
 
 sys.exit(app.exec_())
+
+
+
+
+
+
