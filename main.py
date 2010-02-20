@@ -5,19 +5,25 @@ app = QtGui.QApplication(sys.argv)
 
 scene = QtGui.QGraphicsScene()
 scene.setSceneRect(-200, -200, 400, 400)
+i = 0
+def AAA():
+	global i
+	i = i + 1
+	print i
 
 class Pic(QtGui.QGraphicsItem):
 	
 	def boundingRect(self):
-		ad = 2
-		return QtCore.QRectF(-10 - ad, -10 - ad, 23 + ad, 23 + ad)
+		return QtCore.QRectF(-50, -50, 100, 100)
 	def paint(self, painter, option, widget):
-		painter.drawEllipse(0, 0, 20, 20)
+		painter.drawRect(-50, -50, 100, 100)
 	def mousePressEvent(self, event):
-		print "AAA"
-		
+		AAA()
+	
+
+
 node = Pic()
-node.setPos(-50, 50)
+#node.setPos(-50, 50)
 scene.addItem(node)
 
 
