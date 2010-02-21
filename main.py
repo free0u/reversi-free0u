@@ -1,9 +1,7 @@
 # -*- coding: UTF-8 -*-
 import sys
 from PyQt4 import QtGui, QtCore
-import time
 import random
-import sys
 
 	
 class Kletka(QtGui.QGraphicsPixmapItem):
@@ -71,7 +69,22 @@ class Window(QtGui.QWidget):
 		grid.addWidget(gamepole)
 		
 		self.setLayout(grid)
-		
+
+def win():
+	b = getScore(0)
+	w = getScore(1)
+	global window
+	global app
+	if b == w:
+		text = rus("Ќичь€.")
+	elif b > w:
+		text = rus("ѕобедили <b>черные</b>. —чет " + str(b) + ":" + str(w))
+	else:
+		text = rus("ѕобедили <b>белые</b>. —чет " + str(w) + ":" + str(b))
+	
+	QtGui.QMessageBox.information(window, rus("»гра закончена!"), "<center>" + text + "</center>", QtGui.QMessageBox.Ok)
+
+	newGame()
 		
 def rus(s):
 	return unicode(s, 'cp1251')
@@ -142,14 +155,15 @@ def newGame():
 	player = 0
 	currentPlayer()
 	pole = [
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1, 0, 1,-1,-1,-1],
-			[-1,-1,-1, 1, 0,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
-			[-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1, 0, 1,-1,-1,-1,-1],
+			[-1,-1,-1, 1, 0,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+			[-1,-1,-1,-1,-1,-1,-1,-1,-1]
 		]
 	reloadPole()
 	
@@ -171,9 +185,8 @@ def rev(c):
 	else:
 		return 0
 
-def res(row, col, dir, act = 0):
+def step(player, row, col, dir, act = 0):
 	global pole
-	global player
 	me = player
 	opp = rev(player)
 	
@@ -189,7 +202,6 @@ def res(row, col, dir, act = 0):
 			if (pole[m][col] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					m = row - 1
 					while (pole[m][col] == opp) & (m >= 0):
 						pole[m][col] = rev(pole[m][col])
@@ -207,7 +219,6 @@ def res(row, col, dir, act = 0):
 			if (pole[m][col] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					m = row + 1
 					while (pole[m][col] == opp) & (m <= 7):
 						pole[m][col] = rev(pole[m][col])
@@ -225,7 +236,6 @@ def res(row, col, dir, act = 0):
 			if (pole[row][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					n = col - 1
 					while (pole[row][n] == opp) & (n >= 0):
 						pole[row][n] = rev(pole[row][n])
@@ -243,7 +253,6 @@ def res(row, col, dir, act = 0):
 			if (pole[row][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					n = col + 1
 					while (pole[row][n] == opp) & (n <= 7):
 						pole[row][n] = rev(pole[row][n])
@@ -256,14 +265,13 @@ def res(row, col, dir, act = 0):
 			n = col + 1
 			change = 0			
 			while (pole[m][n] == opp) & (m >= 0) & (n <= 7):
-				m = n - 1
+				m = m - 1
 				n = n + 1
 				change = 1			
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					m = row - 1
 					n = col + 1
 					while (pole[m][n] == opp) & (m >= 0) & (n <= 7):
@@ -276,16 +284,16 @@ def res(row, col, dir, act = 0):
 		elif (dir == "ul") & (row != 0) & (col != 0): # вверх-влево
 			m = row - 1
 			n = col - 1
-			change = 0			
+			change = 0		
+			
 			while (pole[m][n] == opp) & (m >= 0) & (n >= 0):
-				m = n - 1
+				m = m - 1
 				n = n - 1
-				change = 1			
+				change = 1		
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					m = row - 1
 					n = col - 1
 					while (pole[m][n] == opp) & (m >= 0) & (n >= 0):
@@ -300,14 +308,13 @@ def res(row, col, dir, act = 0):
 			n = col + 1
 			change = 0			
 			while (pole[m][n] == opp) & (m <= 7) & (n <= 7):
-				m = n + 1
+				m = m + 1
 				n = n + 1
 				change = 1			
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:
-					pole[row][col] = me
 					m = row + 1
 					n = col + 1
 					while (pole[m][n] == opp) & (m <= 7) & (n <= 7):
@@ -320,7 +327,7 @@ def res(row, col, dir, act = 0):
 		elif (dir == "dl") & (row != 7) & (col != 0): # вниз-влево
 			m = row + 1
 			n = col - 1
-			change = 0			
+			change = 0	
 			while (pole[m][n] == opp) & (m <= 7) & (n >= 0):
 				m = m + 1
 				n = n - 1
@@ -329,7 +336,6 @@ def res(row, col, dir, act = 0):
 			if (pole[m][n] == me) & (change):
 				# если требуетс€ сходить
 				if act:					
-					pole[row][col] = me
 					m = row + 1
 					n = col - 1
 					while (pole[m][n] == opp) & (m <= 7) & (n >= 0):
@@ -339,58 +345,90 @@ def res(row, col, dir, act = 0):
 				# если ходить не требуетс€
 				else:
 					return 1
+			
+	return 0
+		
+def canStep(p):
+	for row in range(8):
+		for col in range(8):
+			if step(p, row, col, "u"):
+				return 1
+			elif step(p, row, col, "d"):
+				return 1
+			elif step(p, row, col, "l"):
+				return 1
+			elif step(p, row, col, "r"):
+				return 1
+			elif step(p, row, col, "ul"):
+				return 1
+			elif step(p, row, col, "ur"):
+				return 1
+			elif step(p, row, col, "dl"):
+				return 1
+			elif step(p, row, col, "dr"):
+				return 1
 	return 0
 		
 def pressed(x,y):
 	row = int(y / 64)
 	col = int(x / 64)
-	step = 0
+	go = 0
+	global player
 	
 	# вверх
-	if res(row, col, "u"):
-		res(row, col, "u", 1)
-		step = 1
+	if step(player, row, col, "u"):
+		step(player, row, col, "u", 1)
+		go = 1
 		
 	# вниз
-	if res(row, col, "d"):
-		res(row, col, "d", 1)
-		step = 1
+	if step(player, row, col, "d"):
+		step(player, row, col, "d", 1)
+		go = 1
 		
 	# влево
-	if res(row, col, "l"):
-		res(row, col, "l", 1)
-		step = 1
+	if step(player, row, col, "l"):
+		step(player, row, col, "l", 1)
+		go = 1
 		
 	# вправо
-	if res(row, col, "r"):
-		res(row, col, "r", 1)
-		step = 1
+	if step(player, row, col, "r"):
+		step(player, row, col, "r", 1)
+		go = 1
 		
 	# вверх-влево
-	if res(row, col, "ul"):
-		res(row, col, "ul", 1)
-		step = 1
+	if step(player, row, col, "ul"):
+		step(player, row, col, "ul", 1)
+		go = 1
 		
 	# вверх-вправо
-	if res(row, col, "ur"):
-		res(row, col, "ur", 1)
-		step = 1
+	if step(player, row, col, "ur"):
+		step(player, row, col, "ur", 1)
+		go = 1
 		
 	# вниз-влево
-	if res(row, col, "dl"):
-		res(row, col, "dl", 1)
-		step = 1
+	if step(player, row, col, "dl"):
+		step(player, row, col, "dl", 1)
+		go = 1
 		
 	# вниз-вправо
-	if res(row, col, "dr"):
-		res(row, col, "dr", 1)
-		step = 1
+	if step(player, row, col, "dr"):
+		step(player, row, col, "dr", 1)
+		go = 1
+	
+	if go:
+		pole[row][col] = player
+		if canStep(rev(player)):
+			player = rev(player)
+			currentPlayer()	
 	reloadPole()
+
+	if (not canStep(rev(player))) & (not canStep(player)):
+		win()
 	
 app = QtGui.QApplication(sys.argv)
 
 # 0 - ход€т черные, 1 -  белые
-player = 0
+player = 1
 fishki = []
 pole = []
 
