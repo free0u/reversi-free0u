@@ -2,7 +2,8 @@
 import sys
 from PyQt4 import QtGui, QtCore
 import random
-
+import math
+import time
 	
 class Kletka(QtGui.QGraphicsPixmapItem):
 	def __init__(self):
@@ -167,6 +168,9 @@ def newGame():
 		]
 	reloadPole()
 	
+def delay():
+	#x = 2 ** 100000
+	time.sleep(1)
 		
 def reloadPole():
 	global pole
@@ -189,17 +193,19 @@ def step(player, row, col, dir, act = 0):
 	global pole
 	me = player
 	opp = rev(player)
-	
 	# если клетка пустая
 	if pole[row][col] == -1:
 		if (dir == "u") & (row != 0): # вверх
+			kol = 0
 			m = row - 1
 			change = 0			
 			while (pole[m][col] == opp) & (m >= 0):
 				m = m - 1
-				change = 1			
+				change = 1	
+				kol = kol + 1			
 			# можно ли сходить?
 			if (pole[m][col] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					m = row - 1
@@ -208,15 +214,18 @@ def step(player, row, col, dir, act = 0):
 						m = m - 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "d") & (row != 7): # вниз
+			kol = 0
 			m = row + 1
 			change = 0			
 			while (pole[m][col] == opp) & (m <= 7):
 				m = m + 1
-				change = 1			
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[m][col] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					m = row + 1
@@ -225,15 +234,18 @@ def step(player, row, col, dir, act = 0):
 						m = m + 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "l") & (col != 0): # влево
+			kol = 0
 			n = col - 1
 			change = 0			
 			while (pole[row][n] == opp) & (n >= 0):
 				n = n - 1
-				change = 1			
+				change = 1
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[row][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					n = col - 1
@@ -242,15 +254,18 @@ def step(player, row, col, dir, act = 0):
 						n = n - 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "r") & (col != 7): # вправо
+			kol = 0
 			n = col + 1
 			change = 0			
 			while (n <= 7) & (pole[row][n] == opp):
 				n = n + 1
-				change = 1			
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[row][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					n = col + 1
@@ -259,17 +274,20 @@ def step(player, row, col, dir, act = 0):
 						n = n + 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "ur") & (row != 0) & (col != 7): # вверх-вправо
+			kol = 0
 			m = row - 1
 			n = col + 1
 			change = 0			
 			while (pole[m][n] == opp) & (m >= 0) & (n <= 7):
 				m = m - 1
 				n = n + 1
-				change = 1			
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					m = row - 1
@@ -280,8 +298,9 @@ def step(player, row, col, dir, act = 0):
 						n = n + 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "ul") & (row != 0) & (col != 0): # вверх-влево
+			kol = 0
 			m = row - 1
 			n = col - 1
 			change = 0		
@@ -289,9 +308,11 @@ def step(player, row, col, dir, act = 0):
 			while (pole[m][n] == opp) & (m >= 0) & (n >= 0):
 				m = m - 1
 				n = n - 1
-				change = 1		
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					m = row - 1
@@ -302,17 +323,20 @@ def step(player, row, col, dir, act = 0):
 						n = n - 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "dr") & (row != 7) & (col != 7): # вниз-вправо
+			kol = 0
 			m = row + 1
 			n = col + 1
 			change = 0			
 			while (pole[m][n] == opp) & (m <= 7) & (n <= 7):
 				m = m + 1
 				n = n + 1
-				change = 1			
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:
 					m = row + 1
@@ -323,17 +347,20 @@ def step(player, row, col, dir, act = 0):
 						n = n + 1
 				# если ходить не требуется
 				else:
-					return 1
+					return kol
 		elif (dir == "dl") & (row != 7) & (col != 0): # вниз-влево
+			kol = 0
 			m = row + 1
 			n = col - 1
 			change = 0	
 			while (pole[m][n] == opp) & (m <= 7) & (n >= 0):
 				m = m + 1
 				n = n - 1
-				change = 1			
+				change = 1	
+				kol = kol + 1
 			# можно ли сходить?
 			if (pole[m][n] == me) & (change):
+				
 				# если требуется сходить
 				if act:					
 					m = row + 1
@@ -344,10 +371,23 @@ def step(player, row, col, dir, act = 0):
 						n = n - 1
 				# если ходить не требуется
 				else:
-					return 1
-			
+					return kol
 	return 0
-		
+def eated(row, col, player):
+	global pole
+	if pole[row][col] != -1:
+		return 255
+	else:
+		kol = 0
+		kol = kol + step(player, row, col, "u")
+		kol = kol + step(player, row, col, "d")
+		kol = kol + step(player, row, col, "l")
+		kol = kol + step(player, row, col, "r")
+		kol = kol + step(player, row, col, "ur")
+		kol = kol + step(player, row, col, "ul")
+		kol = kol + step(player, row, col, "dr")
+		kol = kol + step(player, row, col, "dl")
+		return kol
 def canStep(p):
 	for row in range(8):
 		for col in range(8):
@@ -368,7 +408,25 @@ def canStep(p):
 			elif step(p, row, col, "dr"):
 				return 1
 	return 0
-		
+	
+def makeStep(player, row, col):
+	if step(player, row, col, "u"):
+		step(player, row, col, "u", 1)
+	if step(player, row, col, "d"):
+		step(player, row, col, "d", 1)
+	if step(player, row, col, "l"):
+		step(player, row, col, "l", 1)
+	if step(player, row, col, "r"):
+		step(player, row, col, "r", 1)
+	if step(player, row, col, "ul"):
+		step(player, row, col, "ul", 1)
+	if step(player, row, col, "ur"):
+		step(player, row, col, "ur", 1)
+	if step(player, row, col, "dl"):
+		step(player, row, col, "dl", 1)
+	if step(player, row, col, "dr"):
+		step(player, row, col, "dr", 1)
+	
 def pressed(x,y):
 	row = int(y / 64)
 	col = int(x / 64)
@@ -420,15 +478,58 @@ def pressed(x,y):
 		if canStep(rev(player)):
 			player = rev(player)
 			currentPlayer()	
-	reloadPole()
-
+		reloadPole()
+	
+	if player == 1:
+		compStep(player)
+		player = rev(player)
+		currentPlayer()	
+		reloadPole()
 	if (not canStep(rev(player))) & (not canStep(player)):
 		win()
+	
+def compStep(player):
+	table = [
+				[1, 8, 2, 2, 2, 2, 8, 1],
+				[8, 8, 6, 5, 5, 6, 8, 8],
+				[2, 6, 4, 3, 3, 4, 6, 2],
+				[2, 5, 3, 1, 1, 3, 5, 2],
+				[2, 5, 3, 1, 1, 3, 5, 2],
+				[2, 6, 4, 3, 3, 4, 6, 2],
+				[8, 8, 6, 5, 5, 6, 8, 8],
+				[1, 8, 2, 2, 2, 2, 8, 1]
+			]
+	pX = [0] * 61
+	pY = [0] * 61
+	minE = 9
+	maxE = 0
+	NP = 0
+	for row in range(8):
+		for col in range(8):
+			E = eated(row, col, player)
+			if (minE > table[row][col]) & (E < 255) & (E > 0):
+				minE = table[row][col]
+				NP = 0
+				maxE = 0
+			if (minE == table[row][col]) & (E < 255):
+				if E > maxE:
+					maxE = E
+					NP = 1
+					pX[NP] = row
+					pY[NP] = col
+				elif E == maxE:
+					NP = NP + 1
+					pX[NP] = row
+					pY[NP] = col
+	E = math.trunc(random.random() * NP) + 1
+	# print pX[E], pY[E]
+	makeStep(player, pX[E], pY[E])	
+	pole[pX[E]][pY[E]] = player
 	
 app = QtGui.QApplication(sys.argv)
 
 # 0 - ходят черные, 1 -  белые
-player = 1
+player = 0
 fishki = []
 pole = []
 
