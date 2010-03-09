@@ -5,21 +5,43 @@ import random
 import math
 import time
 	
-class Kletka(QtGui.QGraphicsPixmapItem):
+class Kletka(QtGui.QGraphicsItem):
 	def __init__(self):
-		QtGui.QGraphicsPixmapItem.__init__(self)
-		x = QtGui.QPixmap()
-		x.load("kletka.jpg")			
-		self.setPixmap(x)
+		QtGui.QGraphicsItem.__init__(self)
+
+	def boundingRect(self):
+		return QtCore.QRectF(0, 0, 64, 64)
+	
+	def paint(self, painter, option, widget):
+		gradient = QtGui.QRadialGradient()
+		c = QtGui.QColor(195,195,195,255)
+		gradient.setColorAt(0, c)
+		gradient.setColorAt(1, c)
+		painter.setBrush(QtGui.QBrush(gradient))
+		painter.setPen(QtGui.QPen(QtCore.Qt.black, 2))
+		painter.drawRect(0, 0, 64, 64)			
+		
 	def mousePressEvent(self, event):
 		pressed(self.x(), self.y())
 		
-class Fishka(QtGui.QGraphicsPixmapItem):
-	def __init__(self,colour):
-		QtGui.QGraphicsPixmapItem.__init__(self)
-		x = QtGui.QPixmap()
-		x.load(colour + ".jpg")			
-		self.setPixmap(x)
+class Fishka(QtGui.QGraphicsItem):
+	def __init__(self):
+		QtGui.QGraphicsItem.__init__(self)
+	colour = 0	
+	def boundingRect(self):
+		return QtCore.QRectF(6, 6, 52, 52)
+	
+	def paint(self, painter, option, widget):
+		gradient = QtGui.QRadialGradient()
+		if self.colour == 0: # black
+			gradient.setColorAt(0, QtCore.Qt.black)
+			gradient.setColorAt(1, QtCore.Qt.black)
+		else: # white
+			gradient.setColorAt(0, QtCore.Qt.white)
+			gradient.setColorAt(1, QtCore.Qt.white)
+		painter.setBrush(QtGui.QBrush(gradient))
+		painter.setPen(QtGui.QPen(QtCore.Qt.black, 2))
+		painter.drawEllipse(6, 6, 52, 52)		
 	def mousePressEvent(self, event):
 		pressed(self.x(), self.y())
 
@@ -45,7 +67,7 @@ class Window(QtGui.QWidget):
 		
 		# виджет игрового поля
 		gamepole = QtGui.QGraphicsView(self.scene)
-		
+		gamepole.setRenderHint(QtGui.QPainter.Antialiasing)
 		# буковки (список)
 		hlabel = []
 		for i in range(8):
@@ -134,14 +156,16 @@ def createFishki(scene):
 			y = i * 64
 			fish = []
 			
-			# белые
-			f = Fishka("black")
+			# black
+			f = Fishka()
+			f.colour = 0 
 			scene.addItem(f)
 			f.setPos(x,y)
 			fish.append(f)
 			
-			# черные
-			f = Fishka("white")
+			# white
+			f = Fishka()
+			f.colour = 1
 			scene.addItem(f)
 			f.setPos(x,y)
 			fish.append(f)
@@ -522,6 +546,7 @@ def compStep(player):
 					pX[NP] = row
 					pY[NP] = col
 	E = math.trunc(random.random() * NP) + 1
+	E = 1
 	# print pX[E], pY[E]
 	makeStep(player, pX[E], pY[E])	
 	pole[pX[E]][pY[E]] = player
