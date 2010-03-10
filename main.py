@@ -5,7 +5,7 @@ import random
 import math
 import time
 	
-class Kletka(QtGui.QGraphicsItem):
+class Square(QtGui.QGraphicsItem):
 	def __init__(self):
 		QtGui.QGraphicsItem.__init__(self)
 
@@ -24,7 +24,7 @@ class Kletka(QtGui.QGraphicsItem):
 	def mousePressEvent(self, event):
 		pressed(self.x(), self.y())
 		
-class Fishka(QtGui.QGraphicsItem):
+class Chip(QtGui.QGraphicsItem):
 	def __init__(self):
 		QtGui.QGraphicsItem.__init__(self)
 	colour = 0	
@@ -66,8 +66,8 @@ class Window(QtGui.QWidget):
 		self.scene.setSceneRect(0, 0, 512, 512)
 		
 		# виджет игрового поля
-		gamepole = QtGui.QGraphicsView(self.scene)
-		gamepole.setRenderHint(QtGui.QPainter.Antialiasing)
+		gamearea = QtGui.QGraphicsView(self.scene)
+		gamearea.setRenderHint(QtGui.QPainter.Antialiasing)
 		# буковки (список)
 		hlabel = []
 		for i in range(8):
@@ -89,7 +89,7 @@ class Window(QtGui.QWidget):
 		
 		grid = QtGui.QVBoxLayout()
 		grid.addLayout(headbar)
-		grid.addWidget(gamepole)
+		grid.addWidget(gamearea)
 		
 		self.setLayout(grid)
 
@@ -122,10 +122,10 @@ def currentPlayer():
 	
 def getScore(p):
 	score = 0
-	global pole
+	global area
 	for i in range(8):
 		for j in range(8):
-			if pole[i][j] == p:
+			if area[i][j] == p:
 				score = score + 1
 	return score
 	
@@ -137,9 +137,9 @@ def newKletki(scene):
 		for j in range(8):
 			x = j * 64
 			y = i * 64
-			newk = Kletka()
-			scene.addItem(newk)
-			newk.setPos(x, y)
+			newS = Square()
+			scene.addItem(newS)
+			newS.setPos(x, y)
 
 			
 # -1 - пустое поле	
@@ -157,14 +157,14 @@ def createFishki(scene):
 			fish = []
 			
 			# black
-			f = Fishka()
+			f = Chip()
 			f.colour = 0 
 			scene.addItem(f)
 			f.setPos(x,y)
 			fish.append(f)
 			
 			# white
-			f = Fishka()
+			f = Chip()
 			f.colour = 1
 			scene.addItem(f)
 			f.setPos(x,y)
@@ -175,11 +175,11 @@ def createFishki(scene):
 		
 def newGame():
 	# обнуляем поле
-	global pole
+	global area
 	global player
 	player = 0
 	currentPlayer()
-	pole = [
+	area = [
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
@@ -190,21 +190,21 @@ def newGame():
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1],
 			[-1,-1,-1,-1,-1,-1,-1,-1,-1]
 		]
-	reloadPole()
+	reloadArea()
 	
 def delay():
 	#x = 2 ** 100000
 	time.sleep(1)
 		
-def reloadPole():
-	global pole
+def reloadArea():
+	global area
 	for row in range(8):
 		for col in range(8):
 			fishki[row][col][0].hide()
 			fishki[row][col][1].hide()
-			if pole[row][col] == 0:
+			if area[row][col] == 0:
 				fishki[row][col][0].show()
-			elif pole[row][col] == 1:
+			elif area[row][col] == 1:
 				fishki[row][col][1].show()
 
 def rev(c):
@@ -214,27 +214,27 @@ def rev(c):
 		return 0
 
 def step(player, row, col, dir, act = 0):
-	global pole
+	global area
 	me = player
 	opp = rev(player)
 	# если клетка пустая
-	if pole[row][col] == -1:
+	if area[row][col] == -1:
 		if (dir == "u") & (row != 0): # вверх
 			kol = 0
 			m = row - 1
 			change = 0			
-			while (pole[m][col] == opp) & (m >= 0):
+			while (area[m][col] == opp) & (m >= 0):
 				m = m - 1
 				change = 1	
 				kol = kol + 1			
 			# можно ли сходить?
-			if (pole[m][col] == me) & (change):
+			if (area[m][col] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					m = row - 1
-					while (pole[m][col] == opp) & (m >= 0):
-						pole[m][col] = rev(pole[m][col])
+					while (area[m][col] == opp) & (m >= 0):
+						area[m][col] = rev(area[m][col])
 						m = m - 1
 				# если ходить не требуется
 				else:
@@ -243,18 +243,18 @@ def step(player, row, col, dir, act = 0):
 			kol = 0
 			m = row + 1
 			change = 0			
-			while (pole[m][col] == opp) & (m <= 7):
+			while (area[m][col] == opp) & (m <= 7):
 				m = m + 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[m][col] == me) & (change):
+			if (area[m][col] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					m = row + 1
-					while (pole[m][col] == opp) & (m <= 7):
-						pole[m][col] = rev(pole[m][col])
+					while (area[m][col] == opp) & (m <= 7):
+						area[m][col] = rev(area[m][col])
 						m = m + 1
 				# если ходить не требуется
 				else:
@@ -263,18 +263,18 @@ def step(player, row, col, dir, act = 0):
 			kol = 0
 			n = col - 1
 			change = 0			
-			while (pole[row][n] == opp) & (n >= 0):
+			while (area[row][n] == opp) & (n >= 0):
 				n = n - 1
 				change = 1
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[row][n] == me) & (change):
+			if (area[row][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					n = col - 1
-					while (pole[row][n] == opp) & (n >= 0):
-						pole[row][n] = rev(pole[row][n])
+					while (area[row][n] == opp) & (n >= 0):
+						area[row][n] = rev(area[row][n])
 						n = n - 1
 				# если ходить не требуется
 				else:
@@ -283,18 +283,18 @@ def step(player, row, col, dir, act = 0):
 			kol = 0
 			n = col + 1
 			change = 0			
-			while (n <= 7) & (pole[row][n] == opp):
+			while (n <= 7) & (area[row][n] == opp):
 				n = n + 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[row][n] == me) & (change):
+			if (area[row][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					n = col + 1
-					while (pole[row][n] == opp) & (n <= 7):
-						pole[row][n] = rev(pole[row][n])
+					while (area[row][n] == opp) & (n <= 7):
+						area[row][n] = rev(area[row][n])
 						n = n + 1
 				# если ходить не требуется
 				else:
@@ -304,20 +304,20 @@ def step(player, row, col, dir, act = 0):
 			m = row - 1
 			n = col + 1
 			change = 0			
-			while (pole[m][n] == opp) & (m >= 0) & (n <= 7):
+			while (area[m][n] == opp) & (m >= 0) & (n <= 7):
 				m = m - 1
 				n = n + 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[m][n] == me) & (change):
+			if (area[m][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					m = row - 1
 					n = col + 1
-					while (pole[m][n] == opp) & (m >= 0) & (n <= 7):
-						pole[m][n] = rev(pole[m][n])
+					while (area[m][n] == opp) & (m >= 0) & (n <= 7):
+						area[m][n] = rev(area[m][n])
 						m = m - 1
 						n = n + 1
 				# если ходить не требуется
@@ -329,20 +329,20 @@ def step(player, row, col, dir, act = 0):
 			n = col - 1
 			change = 0		
 			
-			while (pole[m][n] == opp) & (m >= 0) & (n >= 0):
+			while (area[m][n] == opp) & (m >= 0) & (n >= 0):
 				m = m - 1
 				n = n - 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[m][n] == me) & (change):
+			if (area[m][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					m = row - 1
 					n = col - 1
-					while (pole[m][n] == opp) & (m >= 0) & (n >= 0):
-						pole[m][n] = rev(pole[m][n])
+					while (area[m][n] == opp) & (m >= 0) & (n >= 0):
+						area[m][n] = rev(area[m][n])
 						m = m - 1
 						n = n - 1
 				# если ходить не требуется
@@ -353,20 +353,20 @@ def step(player, row, col, dir, act = 0):
 			m = row + 1
 			n = col + 1
 			change = 0			
-			while (pole[m][n] == opp) & (m <= 7) & (n <= 7):
+			while (area[m][n] == opp) & (m <= 7) & (n <= 7):
 				m = m + 1
 				n = n + 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[m][n] == me) & (change):
+			if (area[m][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:
 					m = row + 1
 					n = col + 1
-					while (pole[m][n] == opp) & (m <= 7) & (n <= 7):
-						pole[m][n] = rev(pole[m][n])
+					while (area[m][n] == opp) & (m <= 7) & (n <= 7):
+						area[m][n] = rev(area[m][n])
 						m = m + 1
 						n = n + 1
 				# если ходить не требуется
@@ -377,20 +377,20 @@ def step(player, row, col, dir, act = 0):
 			m = row + 1
 			n = col - 1
 			change = 0	
-			while (pole[m][n] == opp) & (m <= 7) & (n >= 0):
+			while (area[m][n] == opp) & (m <= 7) & (n >= 0):
 				m = m + 1
 				n = n - 1
 				change = 1	
 				kol = kol + 1
 			# можно ли сходить?
-			if (pole[m][n] == me) & (change):
+			if (area[m][n] == me) & (change):
 				
 				# если требуется сходить
 				if act:					
 					m = row + 1
 					n = col - 1
-					while (pole[m][n] == opp) & (m <= 7) & (n >= 0):
-						pole[m][n] = rev(pole[m][n])
+					while (area[m][n] == opp) & (m <= 7) & (n >= 0):
+						area[m][n] = rev(area[m][n])
 						m = m + 1
 						n = n - 1
 				# если ходить не требуется
@@ -398,8 +398,8 @@ def step(player, row, col, dir, act = 0):
 					return kol
 	return 0
 def eated(row, col, player):
-	global pole
-	if pole[row][col] != -1:
+	global area
+	if area[row][col] != -1:
 		return 255
 	else:
 		kol = 0
@@ -498,17 +498,17 @@ def pressed(x,y):
 		go = 1
 	
 	if go:
-		pole[row][col] = player
+		area[row][col] = player
 		if canStep(rev(player)):
 			player = rev(player)
 			currentPlayer()	
-		reloadPole()
+		reloadArea()
 	
 	if player == 1:
 		compStep(player)
 		player = rev(player)
 		currentPlayer()	
-		reloadPole()
+		reloadArea()
 	if (not canStep(rev(player))) & (not canStep(player)):
 		win()
 	
@@ -549,14 +549,14 @@ def compStep(player):
 	E = 1
 	# print pX[E], pY[E]
 	makeStep(player, pX[E], pY[E])	
-	pole[pX[E]][pY[E]] = player
+	area[pX[E]][pY[E]] = player
 	
 app = QtGui.QApplication(sys.argv)
 
 # 0 - ходят черные, 1 -  белые
 player = 0
 fishki = []
-pole = []
+area = []
 
 window = Window()
 window.show()
